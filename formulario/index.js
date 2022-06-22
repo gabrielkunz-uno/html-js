@@ -36,9 +36,7 @@ formulario.addEventListener('submit', (evento) => {
     //- precisa ser com JSON.stringify() pois o banco apenas aceita string
     localStorage.setItem('produtos', JSON.stringify(produtosCadastrados))
 
-    //adiciona produto cadastrado na tabela visualmente
-    adicionarProdutoNaTabela(produto);
-    adicionarEventosDosBotoesDeExclusao();
+    document.location.reload();
 });
 
 // o parametro "array" deve ser gerado a partir da funcao
@@ -90,7 +88,6 @@ function adicionarEventosDosBotoesDeExclusao() {
     });
 
     function excluirRegistro(evento) {
-        console.log(evento);
         let produtoParaExcluir = evento.target.dataset.produto;
         if (confirm(`Deseja excluir o produto ${produtoParaExcluir}?`)) {
             //buscamos todos os produtos cadastrados
