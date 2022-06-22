@@ -1,5 +1,5 @@
 const formulario = document.getElementById('formulario');
-const produtosCadastrados = document.getElementById('produtosCadastrados');
+const tabelaProdutos = document.getElementById('tabelaProdutos');
 
 popularTabelaAoCarregarPagina();
 
@@ -9,24 +9,34 @@ formulario.addEventListener('submit', (evento) => {
     let data = $('#formulario').serializeArray();
     let produto = arrayToObject(data);
 
-    adicionarProdutoNaTabela(produto);
-
     //SET - Setar, definir, salvar
     //GET - Pegar, buscar
 
     //recuperar os registros já cadastrados no banco
     //como no banco ta cadastrado como string, precisamos do JSON.parse()
     //para forçar a ser um objeto/array
-    let produtos = JSON.parse(localStorage.getItem('produtos')) || [];
+    let produtosCadastrados = JSON.parse(localStorage.getItem('produtos')) || [];
     
+    let codigoDuplicado = produtosCadastrados
+        .map(produtoCadastrado => (JSON.parse(produtoCadastrado)).codigo) //percorrendo o array de produtos e formando um novo array só com o código
+        .includes(produto.codigo); // verifica com o array formado se o código do produto novo já está cadastrado
+    
+    if (codigoDuplicado) {
+        alert('Já existe um produto cadastrado com esse código. Não é possível cadastrar esse produto.');
+        return;
+    }
+
     //adiciona o produto que esta sendo cadastrado ao array de produtos ja
     //cadastrados no banco de dados
     //- precisa ser com JSON.stringify() pois o banco apenas aceita string
-    produtos.push(JSON.stringify(produto));
+    produtosCadastrados.push(JSON.stringify(produto));
 
     //atualizar os produtos no banco de dados
     //- precisa ser com JSON.stringify() pois o banco apenas aceita string
-    localStorage.setItem('produtos', JSON.stringify(produtos))
+    localStorage.setItem('produtos', JSON.stringify(produtosCadastrados))
+    
+    //adiciona produto cadastrado na tabela visualmente
+    adicionarProdutoNaTabela(produto);
 });
 
 // o parametro "array" deve ser gerado a partir da funcao
@@ -46,11 +56,12 @@ function adicionarProdutoNaTabela(produto) {
         <tr>
             <td>${produto.codigo}</td>
             <td>${produto.descricao}</td>
-            <td>${produto.valorVenda}</td>
-            <td>${produto.precoCusto}</td>
+            <td>R$ ${Number(produto.valorVenda).toFixed(2)}</td>
+            <td>R$ ${Number(produto.precoCusto).toFixed(2)}</td>
+            <td><button class="btn btn-outline-danger">Excluir</button></td>
         </tr>
     `;
-    produtosCadastrados.appendChild(tr);
+    tabelaProdutos.appendChild(tr);
 }
 
 function popularTabelaAoCarregarPagina() {
